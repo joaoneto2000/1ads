@@ -17,6 +17,7 @@ public class Pong extends JPanel implements ActionListener {
     private static final int ALTURA = 520;
     private static final int LARGURA_RAQUETE = 14;
     private static final int ALTURA_RAQUETE = 92;
+    private static final int ALTURA_RAQUETE_JOGADOR = 110;
     private static final int TAMANHO_BOLA = 16;
     private static final int VELOCIDADE_RAQUETE = 7;
 
@@ -59,7 +60,7 @@ public class Pong extends JPanel implements ActionListener {
     private void reiniciarJogo() {
         pontosJogador = 0;
         pontosComputador = 0;
-        jogadorY = (ALTURA - ALTURA_RAQUETE) / 2;
+        jogadorY = (ALTURA - ALTURA_RAQUETE_JOGADOR) / 2;
         computadorY = jogadorY;
         colocarBolaNoCentro();
     }
@@ -82,7 +83,7 @@ public class Pong extends JPanel implements ActionListener {
     private void atualizarJogador() {
         if (sobe) jogadorY -= VELOCIDADE_RAQUETE;
         if (desce) jogadorY += VELOCIDADE_RAQUETE;
-        jogadorY = limitar(jogadorY, 0, ALTURA - ALTURA_RAQUETE);
+        jogadorY = limitar(jogadorY, 0, ALTURA - ALTURA_RAQUETE_JOGADOR);
     }
 
     private void atualizarComputador() {
@@ -102,11 +103,11 @@ public class Pong extends JPanel implements ActionListener {
             bolaY = limitar(bolaY, 0, ALTURA - TAMANHO_BOLA);
         }
 
-        if (colide(30, jogadorY, bolaX, bolaY) && velocidadeX < 0) {
-            rebater(30, jogadorY, true);
+        if (colide(30, jogadorY, ALTURA_RAQUETE_JOGADOR, bolaX, bolaY) && velocidadeX < 0) {
+            rebater(30, jogadorY, ALTURA_RAQUETE_JOGADOR, true);
         }
-        if (colide(LARGURA - 30 - LARGURA_RAQUETE, computadorY, bolaX, bolaY) && velocidadeX > 0) {
-            rebater(LARGURA - 30 - LARGURA_RAQUETE, computadorY, false);
+        if (colide(LARGURA - 30 - LARGURA_RAQUETE, computadorY, ALTURA_RAQUETE, bolaX, bolaY) && velocidadeX > 0) {
+            rebater(LARGURA - 30 - LARGURA_RAQUETE, computadorY, ALTURA_RAQUETE, false);
         }
 
         if (bolaX < -TAMANHO_BOLA) {
@@ -119,15 +120,15 @@ public class Pong extends JPanel implements ActionListener {
         }
     }
 
-    private boolean colide(int raqueteX, int raqueteY, int x, int y) {
+    private boolean colide(int raqueteX, int raqueteY, int alturaRaquete, int x, int y) {
         return x < raqueteX + LARGURA_RAQUETE && x + TAMANHO_BOLA > raqueteX
-                && y < raqueteY + ALTURA_RAQUETE && y + TAMANHO_BOLA > raqueteY;
+                && y < raqueteY + alturaRaquete && y + TAMANHO_BOLA > raqueteY;
     }
 
-    private void rebater(int raqueteX, int raqueteY, boolean esquerda) {
+    private void rebater(int raqueteX, int raqueteY, int alturaRaquete, boolean esquerda) {
         velocidadeX = esquerda ? Math.abs(velocidadeX) + 1 : -Math.abs(velocidadeX) - 1;
         velocidadeX = limitar(velocidadeX, -9, 9);
-        int diferenca = (bolaY + TAMANHO_BOLA / 2) - (raqueteY + ALTURA_RAQUETE / 2);
+        int diferenca = (bolaY + TAMANHO_BOLA / 2) - (raqueteY + alturaRaquete / 2);
         velocidadeY = limitar(diferenca / 10, -6, 6);
         if (velocidadeY == 0) velocidadeY = Math.random() < 0.5 ? -2 : 2;
         bolaX = esquerda ? raqueteX + LARGURA_RAQUETE : raqueteX - TAMANHO_BOLA;
@@ -142,8 +143,11 @@ public class Pong extends JPanel implements ActionListener {
         super.paintComponent(g);
         g.setColor(new Color(230, 236, 245));
         for (int y = 12; y < ALTURA; y += 28) g.fillRect(LARGURA / 2 - 2, y, 4, 16);
-        g.fillRect(30, jogadorY, LARGURA_RAQUETE, ALTURA_RAQUETE);
+        g.setColor(new Color(48, 140, 255));
+        g.fillRect(30, jogadorY, LARGURA_RAQUETE, ALTURA_RAQUETE_JOGADOR);
+        g.setColor(new Color(235, 70, 70));
         g.fillRect(LARGURA - 30 - LARGURA_RAQUETE, computadorY, LARGURA_RAQUETE, ALTURA_RAQUETE);
+        g.setColor(new Color(230, 236, 245));
         g.fillOval(bolaX, bolaY, TAMANHO_BOLA, TAMANHO_BOLA);
 
         g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 34));
